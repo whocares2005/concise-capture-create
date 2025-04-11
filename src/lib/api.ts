@@ -26,9 +26,6 @@ export interface ImageAnalysisResponse {
   powered?: string;
 }
 
-// Mock delay to simulate API call
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 // Extract keywords function
 function extractKeywords(text: string): string[] {
   // This is a simplified implementation
@@ -78,7 +75,7 @@ export async function generateSummary(request: SummaryRequest): Promise<SummaryR
       formatInstruction = "Provide a comprehensive summary that captures all the main points, ideas, and arguments in the text. Structure it as coherent paragraphs.";
     } 
     else if (request.format === "bullets") {
-      formatInstruction = "Create a bullet-point summary (up to 10 points) that captures the key information in the text. Each point should be concise and contain a complete idea.";
+      formatInstruction = "Create a bullet-point summary (up to 10 points) that captures the key information in the text. Each point should begin with a dash (-) and be on a new line. Make each point concise and contain a complete idea.";
     }
     else if (request.format === "image") {
       // For image generation, we'll still use a placeholder
@@ -93,7 +90,7 @@ export async function generateSummary(request: SummaryRequest): Promise<SummaryR
     const prompt = `
       I need you to summarize the following text.
       ${formatInstruction}
-      If it's a bullet point format, use newlines to separate each bullet point.
+      If it's a bullet point format, start each point with a dash (-) and make sure each point is on a new line.
       
       Here's the text to summarize:
       ${request.text}
@@ -147,14 +144,18 @@ export async function generateSummary(request: SummaryRequest): Promise<SummaryR
       throw new Error("No summary was generated");
     }
     
-    // For bullet points, make sure each line is a separate bullet
+    // For bullet points, ensure proper formatting
     if (request.format === "bullets") {
-      // If summary doesn't already have newlines, add them
-      if (!summary.includes('\n')) {
-        summary = summary.split(/[.!?]+/)
-          .filter(s => s.trim().length > 0)
-          .map(s => s.trim())
-          .join("\n");
+      // If the response doesn't already have proper bullet point format,
+      // we'll format it ourselves by splitting on dashes or new lines
+      const lines = summary.split('\n').filter(line => line.trim().length > 0);
+      
+      // Check if there are bullet points already (lines starting with - or •)
+      const hasBullets = lines.some(line => line.trim().match(/^[-•*]\s/));
+      
+      if (!hasBullets) {
+        // Format each line as a bullet point
+        summary = lines.map(line => line.trim().replace(/^[•*-]?\s*/, '- ')).join('\n');
       }
     }
     

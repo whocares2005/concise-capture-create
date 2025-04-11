@@ -62,6 +62,23 @@ export default function SummaryResult({ content, type, keywords = [], poweredBy 
     toast.success("Summary downloaded");
   };
 
+  // Format bullet points from string to list items
+  const formatBulletPoints = (bulletText: string) => {
+    // Split by newlines and filter out empty lines
+    const lines = bulletText.split('\n').filter(line => line.trim().length > 0);
+    
+    // Process each line to ensure it has proper bullet format
+    return lines.map((line, idx) => {
+      // Remove existing bullet characters and trim whitespace
+      const cleanLine = line.trim().replace(/^[-•*]\s*/, '');
+      return (
+        <li key={idx} className="text-sm">
+          {cleanLine}
+        </li>
+      );
+    });
+  };
+
   return (
     <Card className="animate-fade-up">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
@@ -84,22 +101,18 @@ export default function SummaryResult({ content, type, keywords = [], poweredBy 
       
       <CardContent className="pt-4">
         <div className={cn(
-          "max-h-[500px] overflow-y-auto p-1", // Increased max height from 400px to 500px
+          "max-h-[500px] overflow-y-auto p-1",
           type === "bullets" ? "space-y-2" : ""
         )}>
           {type === "bullets" ? (
-            // Display as a list for bullet points
+            // Display as a list for bullet points with improved formatting
             <ul className="list-disc pl-5 space-y-2">
-              {content.split("\n").filter(Boolean).map((point, index) => (
-                <li key={index} className="text-sm">
-                  {point}
-                </li>
-              ))}
+              {formatBulletPoints(content)}
             </ul>
           ) : (
             // Display as paragraphs for gist with highlighted keywords
             <div 
-              className="text-sm space-y-4 whitespace-pre-line" // Added whitespace-pre-line to preserve paragraph breaks
+              className="text-sm space-y-4 whitespace-pre-line"
               dangerouslySetInnerHTML={{ __html: highlightedContent }}
             />
           )}

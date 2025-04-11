@@ -47,6 +47,11 @@ export default function FormatSelector({
             </TabsTrigger>
           </TabsList>
         </Tabs>
+        <div className="grid grid-cols-3 gap-2 mt-1">
+          <p className="text-xs text-muted-foreground">Detailed paragraphs</p>
+          <p className="text-xs text-muted-foreground">Key points list</p>
+          <p className="text-xs text-muted-foreground">Visual representation</p>
+        </div>
       </div>
       
       <div className="space-y-2">
