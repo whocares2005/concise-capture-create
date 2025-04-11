@@ -10,9 +10,10 @@ interface SummaryResultProps {
   content: string;
   type: "gist" | "bullets";
   keywords?: string[];
+  poweredBy?: string;
 }
 
-export default function SummaryResult({ content, type, keywords = [] }: SummaryResultProps) {
+export default function SummaryResult({ content, type, keywords = [], poweredBy }: SummaryResultProps) {
   const [copied, setCopied] = useState(false);
   const [highlightedContent, setHighlightedContent] = useState(content);
 
@@ -66,6 +67,11 @@ export default function SummaryResult({ content, type, keywords = [] }: SummaryR
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
         <CardTitle className="text-lg font-medium">
           {type === "gist" ? "Summary" : "Key Points"}
+          {poweredBy === "Gemini" && (
+            <span className="ml-2 text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded-full">
+              Powered by Gemini
+            </span>
+          )}
         </CardTitle>
         <div className="bg-primary/10 rounded-full p-1">
           {type === "gist" ? (

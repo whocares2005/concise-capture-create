@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,16 +15,28 @@ export default function Summary() {
   const [activeTab, setActiveTab] = useState<string>("text");
   const [outputFormat, setOutputFormat] = useState<string>("gist");
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [geminiApiKey, setGeminiApiKey] = useState<string>(() => {
+    // Load API key from localStorage if available
+    return localStorage.getItem("gemini_api_key") || "";
+  });
   
   const [textSummary, setTextSummary] = useState<SummaryResponse | null>(null);
   const [imageAnalysis, setImageAnalysis] = useState<ImageAnalysisResponse | null>(null);
+  
+  // Save API key to localStorage when it changes
+  useEffect(() => {
+    if (geminiApiKey) {
+      localStorage.setItem("gemini_api_key", geminiApiKey);
+    }
+  }, [geminiApiKey]);
   
   const handleTextSubmit = async (text: string) => {
     setIsProcessing(true);
     try {
       const result = await generateSummary({
         text,
-        format: outputFormat as "gist" | "bullets" | "image"
+        format: outputFormat as "gist" | "bullets" | "image",
+        apiKey: geminiApiKey
       });
       setTextSummary(result);
     } catch (error) {
@@ -37,7 +49,10 @@ export default function Summary() {
   const handleImageSubmit = async (file: File) => {
     setIsProcessing(true);
     try {
-      const result = await analyzeImage({ image: file });
+      const result = await analyzeImage({ 
+        image: file,
+        apiKey: geminiApiKey
+      });
       setImageAnalysis(result);
     } catch (error) {
       console.error("Image processing error:", error);
@@ -82,7 +97,9 @@ export default function Summary() {
                     <div className="space-y-6">
                       <FormatSelector 
                         selectedFormat={outputFormat} 
-                        onFormatChange={setOutputFormat} 
+                        onFormatChange={setOutputFormat}
+                        apiKey={geminiApiKey}
+                        onApiKeyChange={setGeminiApiKey}
                       />
                       <TextInput 
                         onSubmit={handleTextSubmit} 
@@ -92,10 +109,18 @@ export default function Summary() {
                   </TabsContent>
                   
                   <TabsContent value="image" className="mt-6">
-                    <ImageInput 
-                      onSubmit={handleImageSubmit} 
-                      isProcessing={isProcessing} 
-                    />
+                    <div className="space-y-6">
+                      <FormatSelector 
+                        selectedFormat="gist" 
+                        onFormatChange={() => {}} // No-op for image analysis
+                        apiKey={geminiApiKey}
+                        onApiKeyChange={setGeminiApiKey}
+                      />
+                      <ImageInput 
+                        onSubmit={handleImageSubmit} 
+                        isProcessing={isProcessing} 
+                      />
+                    </div>
                   </TabsContent>
                 </Tabs>
               </CardContent>
@@ -108,13 +133,15 @@ export default function Summary() {
               outputFormat === "image" ? (
                 <ImageResult 
                   imageUrl={textSummary.imageUrl || ""} 
-                  description={textSummary.summary} 
+                  description={textSummary.summary}
+                  poweredBy={textSummary.powered} 
                 />
               ) : (
                 <SummaryResult 
                   content={textSummary.summary} 
                   type={outputFormat as "gist" | "bullets"} 
-                  keywords={textSummary.keywords} 
+                  keywords={textSummary.keywords}
+                  poweredBy={textSummary.powered}
                 />
               )
             )}
@@ -122,7 +149,8 @@ export default function Summary() {
             {activeTab === "image" && imageAnalysis && (
               <ImageResult 
                 imageUrl={imageAnalysis.imageUrl} 
-                description={imageAnalysis.description} 
+                description={imageAnalysis.description}
+                poweredBy={imageAnalysis.powered} 
               />
             )}
             

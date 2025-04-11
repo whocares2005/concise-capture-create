@@ -8,9 +8,10 @@ import { useState } from "react";
 interface ImageResultProps {
   imageUrl: string;
   description: string;
+  poweredBy?: string;
 }
 
-export default function ImageResult({ imageUrl, description }: ImageResultProps) {
+export default function ImageResult({ imageUrl, description, poweredBy }: ImageResultProps) {
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = () => {
@@ -40,7 +41,14 @@ export default function ImageResult({ imageUrl, description }: ImageResultProps)
   return (
     <Card className="animate-fade-up">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-        <CardTitle className="text-lg font-medium">Image Analysis</CardTitle>
+        <CardTitle className="text-lg font-medium">
+          Image Analysis
+          {poweredBy === "Gemini" && (
+            <span className="ml-2 text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded-full">
+              Powered by Gemini
+            </span>
+          )}
+        </CardTitle>
         <div className="bg-primary/10 rounded-full p-1">
           <Image className="h-4 w-4 text-primary" />
         </div>
