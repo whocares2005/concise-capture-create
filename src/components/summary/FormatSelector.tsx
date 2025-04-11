@@ -20,15 +20,18 @@ export default function FormatSelector({ selectedFormat, onFormatChange }: Forma
         <TabsList className="grid grid-cols-3 w-full">
           <TabsTrigger value="gist" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
-            <span className="hidden sm:inline">Gist</span>
+            <span className="hidden sm:inline">Complete Summary</span>
+            <span className="sm:hidden">Summary</span>
           </TabsTrigger>
           <TabsTrigger value="bullets" className="flex items-center gap-2">
             <ListOrdered className="h-4 w-4" />
             <span className="hidden sm:inline">Bullet Points</span>
+            <span className="sm:hidden">Bullets</span>
           </TabsTrigger>
           <TabsTrigger value="image" className="flex items-center gap-2">
             <Image className="h-4 w-4" />
             <span className="hidden sm:inline">Generate Image</span>
+            <span className="sm:hidden">Image</span>
           </TabsTrigger>
         </TabsList>
       </Tabs>

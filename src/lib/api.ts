@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 
 // Mock API service for demo purposes
@@ -33,22 +32,24 @@ export async function generateSummary(request: SummaryRequest): Promise<SummaryR
     // Simulate API delay
     await delay(2000);
     
-    // Get first 2 paragraphs for gist format
-    const paragraphs = request.text.split('\n\n');
-    const firstTwoParas = paragraphs.slice(0, 2).join('\n\n');
-    
     // Mock summary based on format
     let summary = "";
     
     if (request.format === "gist") {
-      // Create a simplified version of the text
-      summary = firstTwoParas.length > 200 
-        ? firstTwoParas.substring(0, 200) + "..." 
-        : firstTwoParas;
+      // Create a more comprehensive summary
+      const paragraphs = request.text.split('\n\n');
       
-      // Add some extra content for longer texts
-      if (request.text.length > 500) {
-        summary += "\n\nThe text continues with additional details and examples that elaborate on the main points presented above.";
+      // Use all the paragraphs but condense them
+      summary = paragraphs.map(para => {
+        // Keep sentences that appear meaningful (longer than 20 chars)
+        return para.split(/[.!?]+/)
+          .filter(s => s.trim().length > 20)
+          .join(". ");
+      }).join("\n\n");
+      
+      // If still very long, trim it down a bit
+      if (summary.length > 1000) {
+        summary = summary.substring(0, 1000) + "...";
       }
       
       // Extract mock keywords
@@ -60,11 +61,13 @@ export async function generateSummary(request: SummaryRequest): Promise<SummaryR
       };
     } 
     else if (request.format === "bullets") {
-      // Create bullet points
+      // Create more comprehensive bullet points
       const sentences = request.text.split(/[.!?]+/);
+      
+      // Take up to 10 meaningful points (instead of just 5)
       const points = sentences
         .filter(s => s.trim().length > 20)  // Only sentences with reasonable length
-        .slice(0, 5)  // Take first 5 points
+        .slice(0, 10)  // Take up to 10 points
         .map(s => s.trim())
         .join("\n");
         

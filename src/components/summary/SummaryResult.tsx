@@ -78,7 +78,7 @@ export default function SummaryResult({ content, type, keywords = [] }: SummaryR
       
       <CardContent className="pt-4">
         <div className={cn(
-          "max-h-[400px] overflow-y-auto p-1",
+          "max-h-[500px] overflow-y-auto p-1", // Increased max height from 400px to 500px
           type === "bullets" ? "space-y-2" : ""
         )}>
           {type === "bullets" ? (
@@ -93,13 +93,13 @@ export default function SummaryResult({ content, type, keywords = [] }: SummaryR
           ) : (
             // Display as paragraphs for gist with highlighted keywords
             <div 
-              className="text-sm space-y-4" 
+              className="text-sm space-y-4 whitespace-pre-line" // Added whitespace-pre-line to preserve paragraph breaks
               dangerouslySetInnerHTML={{ __html: highlightedContent }}
             />
           )}
         </div>
         
-        {keywords.length > 0 && type === "gist" && (
+        {keywords && keywords.length > 0 && type === "gist" && (
           <div className="mt-4 pt-3 border-t">
             <p className="text-sm font-medium mb-2">Keywords:</p>
             <div className="flex flex-wrap gap-2">
